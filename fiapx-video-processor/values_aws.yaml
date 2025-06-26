@@ -1,0 +1,27 @@
+replicaCount: 2
+
+storage:
+  type: aws
+  uploadDir: fiapx-uploaded-videos
+  ouputDir: fiapx-resulted-zipfiles
+  aws:
+    credentials: session
+    region: us-east-1
+
+image:
+  repository: loadinggreg/fiapx-video-processor
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+  targetPort: 8080
+  nodePort: 30081
+
+mysql:
+  database: springdb
+  user: springuser
+
+persistence:
+  size: 
+  storageClass: 

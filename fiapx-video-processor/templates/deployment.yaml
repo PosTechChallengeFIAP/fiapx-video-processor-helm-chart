@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-app
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-app
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          env:
+            - name: DB_HOST
+              value: {{ .Chart.Name }}-mysql-svc
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: {{ .Values.mysql.database }}
+            - name: DB_USER
+              value: {{ .Values.mysql.user }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+            - name: STORAGE_TYPE
+              value: {{ .Values.storage.type }}
+            {{- if eq .Values.storage.type "local" }}
+            - name: UPLOAD_DIR
+              value: {{ printf "data/%s" .Values.storage.uploadDir }}
+            - name: OUTPUT_DIR
+              value: {{ printf "data/%s" .Values.storage.ouputDir }}
+            {{- else }}
+            - name: UPLOAD_DIR
+              value: {{ .Values.storage.uploadDir }}
+            - name: OUTPUT_DIR
+              value: {{ .Values.storage.ouputDir }}
+            - name: AWS_REGION
+              value: {{ .Values.storage.aws.region }}
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access-key
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret-key
+              {{- if eq .Values.storage.aws.credentials "session" }}
+            - name: AWS_SESSION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: session-token
+              {{- end }}
+            {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          {{- if eq .Values.storage.type "local" }}
+          volumeMounts:
+          - name: data
+            mountPath: /app/data
+          {{- end }}
+      {{- if eq .Values.storage.type "local" }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Chart.Name }}-pvc-data
+      {{- end }}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-mysql
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: "mysql:8.0"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.database }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.user }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          emptyDir: {}
