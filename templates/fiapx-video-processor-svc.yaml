@@ -5,6 +5,7 @@ metadata:
   {{- if eq .Values.service.type "LoadBalancer" }}
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
   {{- end }}
 spec:
   type: {{ .Values.service.type }}
