@@ -1,0 +1,18 @@
+name: Trigger Helm Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call helm repo workflow
+        run: |
+          curl -X POST https://api.github.com/repos/PosTechChallengeFIAP/fiapx-integration-helm-chart/dispatches \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.HELM_REPO_TOKEN }}" \
+          -d '{"event_type": "trigger-chart-deploy"}'
