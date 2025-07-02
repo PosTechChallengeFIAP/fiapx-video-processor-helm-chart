@@ -3,7 +3,7 @@ replicaCount: 2
 storage:
   type: aws
   uploadDir: fiapx-uploaded-videos
-  ouputDir: fiapx-resulted-zipfiles
+  outputDir: fiapx-resulted-zipfiles
   aws:
     credentials: session
     region: us-east-1
@@ -27,5 +27,5 @@ persistence:
   size: 
   storageClass: 
 
-user-management:
+userManagement:
   url: "http://fiapx-user-management-cluster-ip-svc:80"

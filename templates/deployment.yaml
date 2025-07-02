@@ -32,17 +32,17 @@ spec:
             - name: STORAGE_TYPE
               value: {{ .Values.storage.type }}
             - name: USER_MANAGEMENT_URL
-              value: {{ .Values.user-management.url }}
+              value: {{ .Values.userManagement.url }}
             {{- if eq .Values.storage.type "local" }}
             - name: UPLOAD_DIR
               value: {{ printf "data/%s" .Values.storage.uploadDir }}
             - name: OUTPUT_DIR
-              value: {{ printf "data/%s" .Values.storage.ouputDir }}
+              value: {{ printf "data/%s" .Values.storage.outputDir }}
             {{- else }}
             - name: UPLOAD_DIR
               value: {{ .Values.storage.uploadDir }}
             - name: OUTPUT_DIR
-              value: {{ .Values.storage.ouputDir }}
+              value: {{ .Values.storage.outputDir }}
             - name: AWS_REGION
               value: {{ .Values.storage.aws.region }}
             - name: AWS_ACCESS_KEY
