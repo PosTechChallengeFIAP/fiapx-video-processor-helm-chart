@@ -31,6 +31,8 @@ spec:
                   key: mysql-password
             - name: STORAGE_TYPE
               value: {{ .Values.storage.type }}
+            - name: USER_MANAGEMENT_URL
+              value: {{ .Values.user-management.url }}
             {{- if eq .Values.storage.type "local" }}
             - name: UPLOAD_DIR
               value: {{ printf "data/%s" .Values.storage.uploadDir }}
