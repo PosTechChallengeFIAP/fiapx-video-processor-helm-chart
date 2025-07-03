@@ -33,6 +33,11 @@ spec:
               value: {{ .Values.storage.type }}
             - name: USER_MANAGEMENT_URL
               value: {{ .Values.userManagement.url }}
+            - name: AWS_SQS_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: aws-sqs-endpoint
             {{- if eq .Values.storage.type "local" }}
             - name: UPLOAD_DIR
               value: {{ printf "data/%s" .Values.storage.uploadDir }}
