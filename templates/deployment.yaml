@@ -19,7 +19,7 @@ spec:
             - name: DB_HOST
               value: {{ .Values.mysql.host }}
             - name: DB_PORT
-              value: {{ .Values.mysql.port }}
+              value: {{ .Values.mysql.port | quote }}
             - name: DB_NAME
               value: {{ .Values.mysql.database }}
             - name: DB_USER
