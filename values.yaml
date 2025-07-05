@@ -22,6 +22,8 @@ service:
 mysql:
   database: springdb
   user: springuser
+  host: localhost
+  port: 3306
 
 persistence:
   size: 10Gi

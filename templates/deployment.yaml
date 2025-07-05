@@ -17,9 +17,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           env:
             - name: DB_HOST
-              value: {{ .Chart.Name }}-mysql-svc
+              value: {{ .Values.mysql.host }}
             - name: DB_PORT
-              value: "3306"
+              value: {{ .Values.mysql.port }}
             - name: DB_NAME
               value: {{ .Values.mysql.database }}
             - name: DB_USER
@@ -97,46 +97,3 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Chart.Name }}-pvc-data
       {{- end }}
-
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Chart.Name }}-mysql
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Chart.Name }}-mysql
-  template:
-    metadata:
-      labels:
-        app: {{ .Chart.Name }}-mysql
-    spec:
-      containers:
-        - name: mysql
-          image: "mysql:8.0"
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: mysql-root-password
-            - name: MYSQL_DATABASE
-              value: {{ .Values.mysql.database }}
-            - name: MYSQL_USER
-              value: {{ .Values.mysql.user }}
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: mysql-password
-          ports:
-            - containerPort: 3306
-          volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
-      volumes:
-        - name: mysql-persistent-storage
-          emptyDir: {}
